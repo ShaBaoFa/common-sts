@@ -16,5 +16,5 @@ use Wlfpanda1012\CommonSts\Response\StsTokenResponse;
 
 interface StsAdapter
 {
-    public function getToken(mixed $data, array $config = []): StsTokenResponse;
+    public function getToken(array $policy, array $config = []): StsTokenResponse;
 }
