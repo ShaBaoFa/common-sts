@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace Wlfpanda1012\CommonSts;
 
+use Wlfpanda1012\CommonSts\Contract\StoragePolicyGenerator;
 use Wlfpanda1012\CommonSts\Contract\StsAdapter;
+use Wlfpanda1012\CommonSts\Exception\UnableToGenerateStoragePolicy;
 use Wlfpanda1012\CommonSts\Response\StsTokenResponse;
 
 class Sts
@@ -24,6 +26,7 @@ class Sts
     public function __construct(
         StsAdapter $adapter,
         array $config = [],
+        private ?StoragePolicyGenerator $storagePolicyGenerator = null,
     ) {
         $this->adapter = $adapter;
         $this->config = $config;
@@ -32,5 +35,20 @@ class Sts
     public function getToken(mixed $data): StsTokenResponse
     {
         return $this->adapter->getToken($data, $this->config);
+    }
+
+    public function storagePolicy(string $effect, array $actions, array|string $path, array $config = []): array
+    {
+        $generator = $this->storagePolicyGenerator ?? $this->adapter;
+
+        if ($generator instanceof StoragePolicyGenerator) {
+            return $generator->storagePolicy(
+                $effect,
+                $actions,
+                $path,
+                $config
+            );
+        }
+        throw new UnableToGenerateStoragePolicy();
     }
 }
